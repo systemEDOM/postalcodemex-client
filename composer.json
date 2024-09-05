@@ -1,0 +1,29 @@
+{
+    "name": "omsoft/postalcodemex-client",
+    "description": "Client for PostalCodeMex API",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "version": "0.0.1",
+    "authors": [
+        {
+            "name": "Daniel Oseguera",
+            "email": "codigito.c@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "OmSoft\\PostalCodeMexClient\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "OmSoft\\PostalCodeMexClient\\PostalCodeMexClientServiceProvider"
+            ],
+            "aliases": {
+                "PostalCodeMexClient": "OmSoft\\PostalCodeMexClient\\Facades\\PostalCodeMexClient"
+            }
+        }
+    },
+    "require": {}
+}
