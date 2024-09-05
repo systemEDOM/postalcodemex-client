@@ -61,7 +61,7 @@ if ($colonias->successful()) {
 }
 ```
 
-Método disponibles
+Métodos disponibles
 
 ```php
 getNeighborhoods(string $cp): PromiseInterface|Response
