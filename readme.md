@@ -51,13 +51,10 @@ En cualquier controlador, servicio o componente de tu aplicación, puedes hacer 
 ```php
 use PostalCodeMexClient;
 
-$colonias = PostalCodeMexClient::getNeighborhoods('12345');
-
-if ($colonias->successful()) {
-    $data = $colonias->json();
-    // Maneja los datos de las colonias
-} else {
-    // Manejar error
+try {
+    $colonias = PostalCodeMexClient::getNeighborhoods('12345');
+} catch (Exception $ex) {
+    // Manejar excepciones
 }
 ```
 
