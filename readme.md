@@ -17,7 +17,7 @@
 Puedes instalar el paquete a través de Composer. Ejecuta el siguiente comando en tu proyecto Laravel:
 
 ```bash
-composer require systemedom/postalcodemex-client
+composer require omsoft/postalcodemex-client
 ```
 
 ### 2. Configuración
