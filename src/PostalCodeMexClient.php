@@ -2,11 +2,13 @@
 
 namespace OmSoft\PostalCodeMexClient;
 
-use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use InvalidArgumentException;
+use RuntimeException;
 
 class PostalCodeMexClient
 {
@@ -28,50 +30,145 @@ class PostalCodeMexClient
     }
 
     /**
-     * @throws ConnectionException
+     * Process response and handle errors
+     *
+     * @param Response $response
+     * @return array
+     * @throws RuntimeException
      */
-    public function getNeighborhoods(string $cp): PromiseInterface|Response
+    protected function processResponse(Response $response): array
     {
-        return $this->makeRequest()->get( "/codigo_postal/{$cp}/colonias");
+        if ($response->failed()) {
+            Log::error('PostalCodeMex API error', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            throw new RuntimeException(
+                "API request failed with status: {$response->status()}, message: {$response->body()}"
+            );
+        }
+
+        return $response->json();
     }
 
     /**
-     * @throws ConnectionException
+     * Get neighborhoods by postal code
+     *
+     * @param string $cp Postal code
+     * @return array
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
      */
-    public function getStates(): PromiseInterface|Response
+    public function getNeighborhoods(string $cp): array
     {
-        return $this->makeRequest()->get( "/estados");
+        if (empty($cp)) {
+            throw new InvalidArgumentException("Postal code cannot be empty");
+        }
+
+        try {
+            $response = $this->makeRequest()->get("/codigo_postal/{$cp}/colonias");
+            return $this->processResponse($response);
+        } catch (ConnectionException $e) {
+            Log::error('PostalCodeMex connection error', ['message' => $e->getMessage()]);
+            throw new RuntimeException("Connection error: {$e->getMessage()}", 0, $e);
+        }
     }
 
     /**
-     * @throws ConnectionException
+     * Get all states
+     *
+     * @return array
+     * @throws RuntimeException
      */
-    public function getTownByState(string $state): PromiseInterface|Response
+    public function getStates(): array
     {
-        return $this->makeRequest()->get( "/estados/{$state}/municipios");
+        try {
+            $response = $this->makeRequest()->get("/estados");
+            return $this->processResponse($response);
+        } catch (ConnectionException $e) {
+            Log::error('PostalCodeMex connection error', ['message' => $e->getMessage()]);
+            throw new RuntimeException("Connection error: {$e->getMessage()}", 0, $e);
+        }
     }
 
     /**
-     * @throws ConnectionException
+     * Get towns by state
+     *
+     * @param string $state State code
+     * @return array
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
      */
-    public function getPostalCodesByTown(string $town): PromiseInterface|Response
+    public function getTownByState(string $state): array
     {
-        return $this->makeRequest()->get( "/municipios/{$town}/codigos_postales");
+        if (empty($state)) {
+            throw new InvalidArgumentException("State code cannot be empty");
+        }
+
+        try {
+            $response = $this->makeRequest()->get("/estados/{$state}/municipios");
+            return $this->processResponse($response);
+        } catch (ConnectionException $e) {
+            Log::error('PostalCodeMex connection error', ['message' => $e->getMessage()]);
+            throw new RuntimeException("Connection error: {$e->getMessage()}", 0, $e);
+        }
     }
 
     /**
-     * @throws ConnectionException
+     * Get postal codes by town
+     *
+     * @param string $town Town code
+     * @return array
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
      */
-    public function getSettlements(): PromiseInterface|Response
+    public function getPostalCodesByTown(string $town): array
     {
-        return $this->makeRequest()->get( "/tipos_asentamientos");
+        if (empty($town)) {
+            throw new InvalidArgumentException("Town code cannot be empty");
+        }
+
+        try {
+            $response = $this->makeRequest()->get("/municipios/{$town}/codigos_postales");
+            return $this->processResponse($response);
+        } catch (ConnectionException $e) {
+            Log::error('PostalCodeMex connection error', ['message' => $e->getMessage()]);
+            throw new RuntimeException("Connection error: {$e->getMessage()}", 0, $e);
+        }
     }
 
     /**
-     * @throws ConnectionException
+     * Get settlement types
+     *
+     * @return array
+     * @throws RuntimeException
      */
-    public function getZones(): PromiseInterface|Response
+    public function getSettlements(): array
     {
-        return $this->makeRequest()->get( "/tipos_zonas");
+        try {
+            $response = $this->makeRequest()->get("/tipos_asentamientos");
+            return $this->processResponse($response);
+        } catch (ConnectionException $e) {
+            Log::error('PostalCodeMex connection error', ['message' => $e->getMessage()]);
+            throw new RuntimeException("Connection error: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    /**
+     * Get zone types
+     *
+     * @return array
+     * @throws RuntimeException
+     */
+    public function getZones(): array
+    {
+        try {
+            $response = $this->makeRequest()->get("/tipos_zonas");
+            return $this->processResponse($response);
+        } catch (ConnectionException $e) {
+            Log::error('PostalCodeMex connection error', ['message' => $e->getMessage()]);
+            throw new RuntimeException("Connection error: {$e->getMessage()}", 0, $e);
+        }
     }
 }
