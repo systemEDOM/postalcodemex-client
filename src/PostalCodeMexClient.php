@@ -17,8 +17,8 @@ class PostalCodeMexClient
 
     public function __construct()
     {
-        $this->baseUrl = config('postalcodemexclient.base_url');
-        $this->apiKey = config('postalcodemexclient.api_key');
+        $this->baseUrl = config('postalcodemexclient.base_url', env('POSTALCODEMEX_BASE_URL', 'https://postalcodemex.omsoft.com.mx/api/v1'));
+        $this->apiKey = config('postalcodemexclient.api_key', env('POSTALCODEMEX_API_KEY', ''));
     }
 
     protected function makeRequest(): PendingRequest

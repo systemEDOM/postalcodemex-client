@@ -12,6 +12,6 @@ return [
     | PostalCodeMex and gives you access to private API endpoints.
     |
     */
-    'base_url' => env('POSTAL_CODE_MEX_BASE_URL', 'https://postalcodemex.omsoft.com.mx/api/v1'),
-    'api_key' => env('POSTAL_CODE_MEX_API_KEY'),
+    'base_url' => env('POSTALCODEMEX_BASE_URL', 'https://postalcodemex.omsoft.com.mx/api/v1'),
+    'api_key' => env('POSTALCODEMEX_API_TOKEN'),
 ];
